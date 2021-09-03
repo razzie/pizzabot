@@ -9,6 +9,20 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+func isAboutPizza(msg *tgbotapi.Message) bool {
+	if msg.Text == "/pizza" {
+		return true
+	}
+
+	for _, word := range strings.Fields(msg.Text) {
+		if strings.ToLower(word) == "pizza" {
+			return true
+		}
+	}
+
+	return false
+}
+
 func main() {
 	token := flag.String("token", "", "Telegram bot API token")
 	flag.Parse()
@@ -20,7 +34,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//bot.Debug = true
 	pizzaStickerSet, err := bot.GetStickerSet(tgbotapi.GetStickerSetConfig{Name: "pizzabot"})
 	if err != nil {
 		log.Fatal(err)
@@ -36,14 +49,7 @@ func main() {
 			continue
 		}
 
-		isAboutPizza := false
-		for _, word := range strings.Fields(update.Message.Text) {
-			if strings.ToLower(word) == "pizza" {
-				isAboutPizza = true
-				break
-			}
-		}
-		if !isAboutPizza {
+		if !isAboutPizza(update.Message) {
 			continue
 		}
 
