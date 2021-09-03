@@ -8,16 +8,6 @@ import (
 	"syscall"
 )
 
-func launchBot(token string, exit <-chan struct{}, wg *sync.WaitGroup) {
-	bot, err := NewPizzaBot(token)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	wg.Add(1)
-	go bot.RunUntil(exit, wg)
-}
-
 func waitForSignal() {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
@@ -31,11 +21,13 @@ func main() {
 	exitChan := make(chan struct{})
 	tokens := os.Args[1:]
 	for _, token := range tokens {
-		launchBot(token, exitChan, &wg)
+		wg.Add(1)
+		go NewPizzaBot(token).RunUntil(exitChan, &wg)
 	}
 	log.Printf("Launched %d bot(s)", len(tokens))
 
 	waitForSignal()
 	close(exitChan)
 	wg.Wait()
+	log.Println("Exiting")
 }
