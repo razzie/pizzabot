@@ -6,6 +6,8 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/razzie/pizzabot/pkg/pizza"
 )
 
 func waitForSignal() {
@@ -22,7 +24,7 @@ func main() {
 	tokens := os.Args[1:]
 	for _, token := range tokens {
 		wg.Add(1)
-		go NewPizzaBot(token).RunUntil(exitChan, &wg)
+		go pizza.NewPizzaBot(token).RunUntil(exitChan, &wg)
 	}
 	log.Printf("Launched %d bot(s)", len(tokens))
 
