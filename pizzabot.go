@@ -10,7 +10,7 @@ import (
 )
 
 func isAboutPizza(msg *tgbotapi.Message) bool {
-	if msg.Text == "/pizza" {
+	if msg.Text == "/pizza" || strings.HasPrefix(msg.Text, "/pizza@") {
 		return true
 	}
 
