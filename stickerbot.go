@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"strings"
+	"sync"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -55,7 +56,8 @@ func (bot *StickerBot) SetLogger(logger *log.Logger) {
 	bot.logger = logger
 }
 
-func (bot *StickerBot) Run(exit <-chan struct{}) {
+func (bot *StickerBot) RunUntil(exit <-chan struct{}, wg *sync.WaitGroup) {
+	defer wg.Done()
 	updateConfig := tgbotapi.NewUpdate(0)
 	updateConfig.Timeout = 30
 	updates := bot.bot.GetUpdatesChan(updateConfig)
@@ -66,6 +68,15 @@ func (bot *StickerBot) Run(exit <-chan struct{}) {
 		case <-exit:
 			return
 		}
+	}
+}
+
+func (bot *StickerBot) Run() {
+	updateConfig := tgbotapi.NewUpdate(0)
+	updateConfig.Timeout = 30
+	updates := bot.bot.GetUpdatesChan(updateConfig)
+	for update := range updates {
+		bot.handleUpdate(update)
 	}
 }
 
