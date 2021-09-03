@@ -130,10 +130,16 @@ func (bot *Bot) getResponder(msg string) *Responder {
 			if len(responder.responses) == 0 {
 				continue
 			}
-			if strings.ToLower(word) == keyword {
+			if wordMatch(word, keyword) {
 				return responder
 			}
 		}
 	}
 	return nil
+}
+
+func wordMatch(word, keyword string) bool {
+	word = strings.ToLower(word)
+	word = strings.Trim(word, "?!.\\/")
+	return word == keyword
 }
