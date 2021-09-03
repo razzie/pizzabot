@@ -55,12 +55,17 @@ func (bot *StickerBot) SetLogger(logger *log.Logger) {
 	bot.logger = logger
 }
 
-func (bot *StickerBot) Run() {
+func (bot *StickerBot) Run(exit <-chan struct{}) {
 	updateConfig := tgbotapi.NewUpdate(0)
 	updateConfig.Timeout = 30
 	updates := bot.bot.GetUpdatesChan(updateConfig)
-	for update := range updates {
-		bot.handleUpdate(update)
+	for {
+		select {
+		case update := <-updates:
+			bot.handleUpdate(update)
+		case <-exit:
+			return
+		}
 	}
 }
 
