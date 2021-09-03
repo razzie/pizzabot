@@ -23,13 +23,14 @@ func waitForSignal() {
 }
 
 func main() {
-	exitChan := make(chan struct{})
+	log.SetOutput(os.Stdout)
 
+	exitChan := make(chan struct{})
 	tokens := os.Args[1:]
 	for _, token := range tokens {
 		launchBot(token, exitChan)
 	}
-	log.Printf("Launched %d bots", len(tokens))
+	log.Printf("Launched %d bot(s)", len(tokens))
 
 	waitForSignal()
 	close(exitChan)
