@@ -38,7 +38,7 @@ func main() {
 
 		isAboutPizza := false
 		for _, word := range strings.Fields(update.Message.Text) {
-			if word == "pizza" {
+			if strings.ToLower(word) == "pizza" {
 				isAboutPizza = true
 				break
 			}
