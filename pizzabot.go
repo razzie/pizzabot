@@ -1,64 +1,16 @@
 package main
 
-import (
-	"flag"
-	"log"
-	"math/rand"
-	"strings"
-
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-)
-
-func isAboutPizza(msg *tgbotapi.Message) bool {
-	if msg.Text == "/pizza" || strings.HasPrefix(msg.Text, "/pizza@") {
-		return true
-	}
-
-	for _, word := range strings.Fields(msg.Text) {
-		if strings.ToLower(word) == "pizza" {
-			return true
-		}
-	}
-
-	return false
+type PizzaBot struct {
+	StickerBot
 }
 
-func main() {
-	token := flag.String("token", "", "Telegram bot API token")
-	flag.Parse()
-
-	rand.Seed(42)
-
-	bot, err := tgbotapi.NewBotAPI(*token)
+func NewPizzaBot(token string) (*PizzaBot, error) {
+	bot, err := NewStickerBot(token, "pizzabot", "pizza")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	pizzaStickerSet, err := bot.GetStickerSet(tgbotapi.GetStickerSetConfig{Name: "pizzabot"})
-	if err != nil {
-		log.Fatal(err)
-	}
-	pizzaStickers := pizzaStickerSet.Stickers
-
-	updateConfig := tgbotapi.NewUpdate(0)
-	updateConfig.Timeout = 30
-
-	updates := bot.GetUpdatesChan(updateConfig)
-	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
-
-		if !isAboutPizza(update.Message) {
-			continue
-		}
-
-		pizza := pizzaStickers[rand.Intn(len(pizzaStickers))]
-		msg := tgbotapi.NewStickerShare(update.Message.Chat.ID, pizza.FileID)
-		msg.ReplyToMessageID = update.Message.MessageID
-		msg.DisableNotification = true
-		if _, err := bot.Send(msg); err != nil {
-			log.Println(err)
-		}
-	}
+	return &PizzaBot{
+		StickerBot: *bot,
+	}, nil
 }
