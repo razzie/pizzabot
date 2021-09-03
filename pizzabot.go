@@ -15,7 +15,7 @@ func NewPizzaBot(token string) *Bot {
 		WithStickerSet("pizzabot").
 		WithLines(PizzaFacts...).
 		Done().
-		WithKeywords("pizza", "pizzák", "pizzát", "pizzákat", "pizzás").
+		WithKeywords("pizza", "pizzas", "pizzák", "pizzát", "pizzákat", "pizzás").
 		WithStickerSet("pizzabot").
 		WithLines(PizzaFacts...).
 		Done()
