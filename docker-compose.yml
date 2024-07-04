@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+  init_pizzabox:
+    image: busybox
+    entrypoint: ["sh", "-c", "if [ -z \"$$TOKEN\" ]; then exit 1; fi"]
+    environment:
+      - TOKEN=${TOKEN}
+    restart: "no"
+
+  pizzabot:
+    image: ghcr.io/razzie/pizzabot:${VERSION:-v1.0}
+    entrypoint: ["sh", "-c", "/pizzabot $${TOKEN}"]
+    environment:
+      - TOKEN=${TOKEN}
+    depends_on:
+      init_pizzabox:
+        condition: service_completed_successfully
+    restart: unless-stopped
